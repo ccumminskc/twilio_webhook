@@ -1,1 +1,1 @@
-web: php -S 0.0.0.0:$PORT twilio_webhook.php
+web: npm start
