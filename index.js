@@ -1,6 +1,5 @@
 // index.js
 const express = require('express');
-const fs = require('fs');
 const app = express();
 
 // Middleware to parse URL-encoded form data (Twilio sends data in this format)
@@ -10,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/', (req, res) => {
     // Log the incoming request body for debugging
     const logData = JSON.stringify(req.body, null, 2);
-    fs.appendFileSync('webhook_log.txt', `Received at ${new Date().toISOString()}:\n${logData}\n\n`);
+    console.log(`Received at ${new Date().toISOString()}:\n${logData}\n\n`);
 
     // Send a 200 OK response with TwiML
     res.set('Content-Type', 'application/xml');
