@@ -8,9 +8,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // FileMaker Data API credentials (to be set as environment variables in Railway.app)
 const fmHost = process.env.FM_HOST || 'a915353.fmphost.com';
-const fmDatabase = process.env.FM_DATABASE || 'YourDatabaseName';
-const fmUsername = process.env.FM_USERNAME || 'your-data-api-username';
-const fmPassword = process.env.FM_PASSWORD || 'your-data-api-password';
+const fmDatabase = process.env.FM_DATABASE || 'Portraits%20By%20Chris.fmp12';
+const fmUsername = process.env.FM_USERNAME || 'APItest';
+const fmPassword = process.env.FM_PASSWORD || 'bXxjJ-S8_S';
 const fmLayout = 'Error Log';
 
 // Webhook endpoint
