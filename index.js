@@ -13,8 +13,11 @@ const fmUsername = process.env.FM_USERNAME;
 const fmPassword = process.env.FM_PASSWORD;
 const fmLayout = 'Error%20Log';
 
-// Debug: Log environment variables to confirm they're being read
-console.log('Environment Variables:', {
+// Debug: Log all environment variables to inspect what's available
+console.log('All Environment Variables:', process.env);
+
+// Debug: Log specific FileMaker environment variables
+console.log('FileMaker Environment Variables:', {
     FM_HOST: process.env.FM_HOST,
     FM_DATABASE: process.env.FM_DATABASE,
     FM_USERNAME: process.env.FM_USERNAME,
