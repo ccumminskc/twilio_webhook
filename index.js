@@ -6,11 +6,11 @@ const app = express();
 // Middleware to parse URL-encoded form data (Twilio sends data in this format)
 app.use(express.urlencoded({ extended: true }));
 
-// FileMaker Data API credentials (from environment variables)
-const fmHost = process.env.FM_HOST || 'a915353.fmphost.com';
-const fmDatabase = process.env.FM_DATABASE || 'Portraits%20By%20Chris.fmp12';
-const fmUsername = process.env.FM_USERNAME || 'APItest';
-const fmPassword = process.env.FM_PASSWORD || 'bXxjJ-S8_S';
+// FileMaker Data API credentials (from environment variables only)
+const fmHost = process.env.FM_HOST;
+const fmDatabase = process.env.FM_DATABASE;
+const fmUsername = process.env.FM_USERNAME;
+const fmPassword = process.env.FM_PASSWORD;
 const fmLayout = 'Error%20Log';
 
 // Webhook endpoint
