@@ -28,10 +28,7 @@ app.post('/', async (req, res) => {
     // Prepare data to send to FileMaker
     const recordData = {
         fieldData: {
-            MessageSID: messageSid,
-            ErrorCode: errorCode,
-            Level: level,
-            Timestamp: timestamp
+             Message Body: Railway app test of Twilio errors
         }
     };
 
