@@ -6,23 +6,16 @@ const app = express();
 // Middleware to parse URL-encoded form data (Twilio sends data in this format)
 app.use(express.urlencoded({ extended: true }));
 
-// FileMaker Data API credentials (from environment variables only)
+// FileMaker Data API credentials (from environment variables)
 const fmHost = process.env.FM_HOST;
 const fmDatabase = process.env.FM_DATABASE;
 const fmUsername = process.env.FM_USERNAME;
 const fmPassword = process.env.FM_PASSWORD;
 const fmLayout = 'Error%20Log';
 
-// Debug: Log all environment variables to inspect what's available
-console.log('All Environment Variables:', process.env);
-
-// Debug: Log specific FileMaker environment variables
-console.log('FileMaker Environment Variables:', {
-    FM_HOST: process.env.FM_HOST,
-    FM_DATABASE: process.env.FM_DATABASE,
-    FM_USERNAME: process.env.FM_USERNAME,
-    FM_PASSWORD: process.env.FM_PASSWORD
-});
+// Twilio credentials (from environment variables)
+const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 
 // Webhook endpoint
 app.post('/', async (req, res) => {
@@ -30,10 +23,45 @@ app.post('/', async (req, res) => {
     const logData = JSON.stringify(req.body, null, 2);
     console.log(`Received at ${new Date().toISOString()}:\n${logData}\n\n`);
 
+    // Extract data from the Twilio webhook
+    const payload = req.body.Payload ? JSON.parse(req.body.Payload) : {};
+    const messageSid = payload.resource_sid || 'Unknown';
+    const errorCode = payload.error_code || 'Unknown';
+
+    // Default error message (for error code 30003)
+    let errorMessage = 'Landline or Unreachable Carrier';
+    if (errorCode !== '30003') {
+        errorMessage = `Error Code ${errorCode}`;
+    }
+
+    // Fetch the message body from Twilio API
+    let smsBody = 'Unknown';
+    try {
+        const twilioResponse = await axios.get(
+            `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages/${messageSid}.json`,
+            {
+                auth: {
+                    username: twilioAccountSid,
+                    password: twilioAuthToken
+                }
+            }
+        );
+        smsBody = twilioResponse.data.body || 'Unknown';
+    } catch (error) {
+        console.error('Error fetching message body from Twilio:', {
+            message: error.message,
+            status: error.response ? error.response.status : 'No status',
+            data: error.response ? error.response.data : 'No data'
+        });
+    }
+
+    // Format the Message Body for FileMaker
+    const messageBody = `Twilio error:\n\nThe following message is undelivered.\nTo: +19137128376\nMessageSID: ${messageSid}\nMessage Body: "${smsBody}"\nError: ${errorMessage}`;
+
     // Prepare data to send to FileMaker
     const recordData = {
         fieldData: {
-            "Message Body": "Railway.app webhook test for Twilio Errors"
+            "Message Body": messageBody
         }
     };
 
