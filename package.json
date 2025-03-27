@@ -1,6 +1,6 @@
 {
   "name": "twilio-webhook",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Webhook for Twilio Notify errors",
   "main": "index.js",
   "scripts": {
