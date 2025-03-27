@@ -7,7 +7,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 
 // FileMaker Data API credentials (to be set as environment variables in Railway.app)
-const fmHost = process.env.FM_HOST || 'your-filemaker-server-domain.com';
+const fmHost = process.env.FM_HOST || 'a915353.fmphost.com';
 const fmDatabase = process.env.FM_DATABASE || 'YourDatabaseName';
 const fmUsername = process.env.FM_USERNAME || 'your-data-api-username';
 const fmPassword = process.env.FM_PASSWORD || 'your-data-api-password';
@@ -38,7 +38,7 @@ app.post('/', async (req, res) => {
     try {
         // Authenticate with FileMaker Data API
         const authResponse = await axios.post(
-            `https://${fmHost}/fmi/data/v1/databases/${fmDatabase}/sessions`,
+            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/sessions`,
             {},
             {
                 headers: {
@@ -63,7 +63,7 @@ app.post('/', async (req, res) => {
 
         // Log out of the Data API session
         await axios.delete(
-            `https://${fmHost}/fmi/data/v1/databases/${fmDatabase}/sessions/${token}`,
+            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/sessions/${token}`,
             {
                 headers: { 'Content-Type': 'application/json' }
             }
