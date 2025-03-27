@@ -17,6 +17,12 @@ const fmLayout = 'Error%20Log';
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 
+// Debug: Log Twilio environment variables
+console.log('Twilio Environment Variables:', {
+    TWILIO_ACCOUNT_SID: twilioAccountSid,
+    TWILIO_AUTH_TOKEN: twilioAuthToken
+});
+
 // Webhook endpoint
 app.post('/', async (req, res) => {
     // Log the incoming request body for debugging
@@ -36,6 +42,7 @@ app.post('/', async (req, res) => {
 
     // Fetch the message body from Twilio API
     let smsBody = 'Unknown';
+    let toNumber = 'Unknown';
     try {
         const twilioResponse = await axios.get(
             `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages/${messageSid}.json`,
@@ -47,6 +54,7 @@ app.post('/', async (req, res) => {
             }
         );
         smsBody = twilioResponse.data.body || 'Unknown';
+        toNumber = twilioResponse.data.to || 'Unknown';
     } catch (error) {
         console.error('Error fetching message body from Twilio:', {
             message: error.message,
@@ -56,7 +64,7 @@ app.post('/', async (req, res) => {
     }
 
     // Format the Message Body for FileMaker
-    const messageBody = `Twilio error:\n\nThe following message is undelivered.\nTo: +19137128376\nMessageSID: ${messageSid}\nMessage Body: "${smsBody}"\nError: ${errorMessage}`;
+    const messageBody = `Twilio error:\n\nThe following message is undelivered.\nTo: ${toNumber}\nMessageSID: ${messageSid}\nMessage Body: "${smsBody}"\nError: ${errorMessage}`;
 
     // Prepare data to send to FileMaker
     const recordData = {
