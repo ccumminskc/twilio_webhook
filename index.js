@@ -6,11 +6,11 @@ const app = express();
 // Middleware to parse URL-encoded form data (Twilio sends data in this format)
 app.use(express.urlencoded({ extended: true }));
 
-// FileMaker Data API credentials (hardcoded for now)
-const fmHost = 'a915353.fmphost.com'; // Replace with your actual FileMaker Server domain
-const fmDatabase = 'Portraits%20By%20Chris.fmp12'; // Replace with your actual database name
-const fmUsername = 'APItest'; // Replace with your actual username
-const fmPassword = 'bXxjJ-S8_S'; // Replace with your actual password
+// FileMaker Data API credentials (hardcoded as provided)
+const fmHost = 'a915353.fmphost.com';
+const fmDatabase = 'Portraits%20By%20Chris.fmp12';
+const fmUsername = 'APItest';
+const fmPassword = 'bXxjJ-S8_S';
 const fmLayout = 'Error%20Log';
 
 // Webhook endpoint
@@ -19,16 +19,10 @@ app.post('/', async (req, res) => {
     const logData = JSON.stringify(req.body, null, 2);
     console.log(`Received at ${new Date().toISOString()}:\n${logData}\n\n`);
 
-    // Extract relevant fields from the Twilio webhook
-    const messageSid = req.body.Payload ? JSON.parse(req.body.Payload).resource_sid : '';
-    const errorCode = req.body.Payload ? JSON.parse(req.body.Payload).error_code : '';
-    const level = req.body.Level || '';
-    const timestamp = req.body.Timestamp || '';
-
     // Prepare data to send to FileMaker
     const recordData = {
         fieldData: {
-             Message Body: Railway app test of Twilio errors
+            "Message Body": "Railway.app webhook test for Twilio Errors"
         }
     };
 
