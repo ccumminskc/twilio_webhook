@@ -11,7 +11,7 @@ const fmHost = process.env.FM_HOST || 'your-filemaker-server-domain.com';
 const fmDatabase = process.env.FM_DATABASE || 'YourDatabaseName';
 const fmUsername = process.env.FM_USERNAME || 'your-data-api-username';
 const fmPassword = process.env.FM_PASSWORD || 'your-data-api-password';
-const fmLayout = 'WebErrors';
+const fmLayout = 'Error Log';
 
 // Webhook endpoint
 app.post('/', async (req, res) => {
@@ -51,7 +51,7 @@ app.post('/', async (req, res) => {
 
         // Create a new record in FileMaker
         await axios.post(
-            `https://${fmHost}/fmi/data/v1/databases/${fmDatabase}/layouts/${fmLayout}/records`,
+            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/layouts/${fmLayout}/records`,
             recordData,
             {
                 headers: {
