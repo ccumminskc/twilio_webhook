@@ -11,7 +11,7 @@ const fmHost = 'a915353.fmphost.com'; // Replace with your actual FileMaker Serv
 const fmDatabase = 'Portraits%20By%20Chris.fmp12'; // Replace with your actual database name
 const fmUsername = 'APItest'; // Replace with your actual username
 const fmPassword = 'bXxjJ-S8_S'; // Replace with your actual password
-const fmLayout = 'Error Log';
+const fmLayout = 'Error%20Log';
 
 // Webhook endpoint
 app.post('/', async (req, res) => {
@@ -39,7 +39,7 @@ app.post('/', async (req, res) => {
         // Authenticate with FileMaker Data API
         console.log('Attempting to authenticate with FileMaker...');
         const authResponse = await axios.post(
-            `https://${fmHost}/fmi/data/v1/databases/${fmDatabase}/sessions`,
+            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/sessions`,
             {},
             {
                 headers: {
@@ -54,7 +54,7 @@ app.post('/', async (req, res) => {
         // Create a new record in FileMaker
         console.log('Creating record in FileMaker...');
         const createResponse = await axios.post(
-            `https://${fmHost}/fmi/data/v1/databases/${fmDatabase}/layouts/${fmLayout}/records`,
+            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/layouts/${fmLayout}/records`,
             recordData,
             {
                 headers: {
@@ -68,7 +68,7 @@ app.post('/', async (req, res) => {
         // Log out of the Data API session
         console.log('Logging out of FileMaker session...');
         await axios.delete(
-            `https://${fmHost}/fmi/data/v1/databases/${fmDatabase}/sessions/${token}`,
+            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/sessions/${token}`,
             {
                 headers: { 'Content-Type': 'application/json' }
             }
