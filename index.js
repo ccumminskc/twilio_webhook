@@ -13,6 +13,14 @@ const fmUsername = process.env.FM_USERNAME;
 const fmPassword = process.env.FM_PASSWORD;
 const fmLayout = 'Error%20Log';
 
+// Debug: Log environment variables to confirm they're being read
+console.log('Environment Variables:', {
+    FM_HOST: process.env.FM_HOST,
+    FM_DATABASE: process.env.FM_DATABASE,
+    FM_USERNAME: process.env.FM_USERNAME,
+    FM_PASSWORD: process.env.FM_PASSWORD
+});
+
 // Webhook endpoint
 app.post('/', async (req, res) => {
     // Log the incoming request body for debugging
