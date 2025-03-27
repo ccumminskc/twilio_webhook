@@ -7,11 +7,11 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 
 // FileMaker Data API credentials (hardcoded for now)
-const fmHost = 'your-filemaker-server-domain.com'; // Replace with your actual FileMaker Server domain
-const fmDatabase = 'YourDatabaseName'; // Replace with your actual database name
-const fmUsername = 'your-data-api-username'; // Replace with your actual username
-const fmPassword = 'your-data-api-password'; // Replace with your actual password
-const fmLayout = 'WebErrors';
+const fmHost = 'a915353.fmphost.com'; // Replace with your actual FileMaker Server domain
+const fmDatabase = 'Portraits%20By%20Chris.fmp12'; // Replace with your actual database name
+const fmUsername = 'APItest'; // Replace with your actual username
+const fmPassword = 'bXxjJ-S8_S'; // Replace with your actual password
+const fmLayout = 'Error Log';
 
 // Webhook endpoint
 app.post('/', async (req, res) => {
