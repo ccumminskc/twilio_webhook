@@ -6,12 +6,12 @@ const app = express();
 // Middleware to parse URL-encoded form data (Twilio sends data in this format)
 app.use(express.urlencoded({ extended: true }));
 
-// FileMaker Data API credentials (to be set as environment variables in Railway.app)
-const fmHost = process.env.FM_HOST || 'a915353.fmphost.com';
-const fmDatabase = process.env.FM_DATABASE || 'Portraits%20By%20Chris.fmp12';
-const fmUsername = process.env.FM_USERNAME || 'APItest';
-const fmPassword = process.env.FM_PASSWORD || 'bXxjJ-S8_S';
-const fmLayout = 'Error Log';
+// FileMaker Data API credentials (hardcoded for now)
+const fmHost = 'your-filemaker-server-domain.com'; // Replace with your actual FileMaker Server domain
+const fmDatabase = 'YourDatabaseName'; // Replace with your actual database name
+const fmUsername = 'your-data-api-username'; // Replace with your actual username
+const fmPassword = 'your-data-api-password'; // Replace with your actual password
+const fmLayout = 'WebErrors';
 
 // Webhook endpoint
 app.post('/', async (req, res) => {
@@ -37,8 +37,9 @@ app.post('/', async (req, res) => {
 
     try {
         // Authenticate with FileMaker Data API
+        console.log('Attempting to authenticate with FileMaker...');
         const authResponse = await axios.post(
-            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/sessions`,
+            `https://${fmHost}/fmi/data/v1/databases/${fmDatabase}/sessions`,
             {},
             {
                 headers: {
@@ -48,10 +49,12 @@ app.post('/', async (req, res) => {
             }
         );
         const token = authResponse.data.response.token;
+        console.log('Authentication successful, token:', token);
 
         // Create a new record in FileMaker
-        await axios.post(
-            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/layouts/${fmLayout}/records`,
+        console.log('Creating record in FileMaker...');
+        const createResponse = await axios.post(
+            `https://${fmHost}/fmi/data/v1/databases/${fmDatabase}/layouts/${fmLayout}/records`,
             recordData,
             {
                 headers: {
@@ -60,16 +63,23 @@ app.post('/', async (req, res) => {
                 }
             }
         );
+        console.log('Record created successfully:', createResponse.data);
 
         // Log out of the Data API session
+        console.log('Logging out of FileMaker session...');
         await axios.delete(
-            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/sessions/${token}`,
+            `https://${fmHost}/fmi/data/v1/databases/${fmDatabase}/sessions/${token}`,
             {
                 headers: { 'Content-Type': 'application/json' }
             }
         );
+        console.log('Logged out successfully');
     } catch (error) {
-        console.error('Error sending data to FileMaker:', error.message);
+        console.error('Error sending data to FileMaker:', {
+            message: error.message,
+            status: error.response ? error.response.status : 'No status',
+            data: error.response ? error.response.data : 'No data'
+        });
     }
 
     // Send a 200 OK response with TwiML
