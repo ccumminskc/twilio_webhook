@@ -12,16 +12,7 @@ const fmDatabase = process.env.FM_DATABASE;
 const fmUsername = process.env.FM_USERNAME;
 const fmPassword = process.env.FM_PASSWORD;
 const fmLayout = 'Error%20Log';
-
-// Twilio credentials (from environment variables)
-const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
-const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
-
-// Debug: Log Twilio environment variables
-console.log('Twilio Environment Variables:', {
-    TWILIO_ACCOUNT_SID: twilioAccountSid,
-    TWILIO_AUTH_TOKEN: twilioAuthToken
-});
+const fmScript = 'Error%20Handling%20Twilio%20Copy';
 
 // Webhook endpoint
 app.post('/', async (req, res) => {
@@ -31,46 +22,19 @@ app.post('/', async (req, res) => {
 
     // Extract data from the Twilio webhook
     const payload = req.body.Payload ? JSON.parse(req.body.Payload) : {};
+    const debugSid = req.body.Sid || 'Unknown';
+    const timestamp = req.body.Timestamp || 'Unknown';
+    const errorLevel = req.body.Level || 'Unknown';
     const messageSid = payload.resource_sid || 'Unknown';
     const errorCode = payload.error_code || 'Unknown';
 
-    // Default error message (for error code 30003)
-    let errorMessage = 'Landline or Unreachable Carrier';
-    if (errorCode !== '30003') {
-        errorMessage = `Error Code ${errorCode}`;
-    }
-
-    // Fetch the message body from Twilio API
-    let smsBody = 'Unknown';
-    let toNumber = 'Unknown';
-    try {
-        const twilioResponse = await axios.get(
-            `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages/${messageSid}.json`,
-            {
-                auth: {
-                    username: twilioAccountSid,
-                    password: twilioAuthToken
-                }
-            }
-        );
-        smsBody = twilioResponse.data.body || 'Unknown';
-        toNumber = twilioResponse.data.to || 'Unknown';
-    } catch (error) {
-        console.error('Error fetching message body from Twilio:', {
-            message: error.message,
-            status: error.response ? error.response.status : 'No status',
-            data: error.response ? error.response.data : 'No data'
-        });
-    }
-
-    // Format the Message Body for FileMaker
-    const messageBody = `Twilio error:\n\nThe following message is undelivered.\nTo: ${toNumber}\nMessageSID: ${messageSid}\nMessage Body: "${smsBody}"\nError: ${errorMessage}`;
-
-    // Prepare data to send to FileMaker
-    const recordData = {
-        fieldData: {
-            "Message Body": messageBody
-        }
+    // Prepare the script parameter for FileMaker
+    const scriptParam = {
+        debug_sid: debugSid,
+        timestamp: timestamp,
+        error: errorLevel,
+        payload_resource_sid: messageSid,
+        error_code: errorCode
     };
 
     try {
@@ -89,19 +53,21 @@ app.post('/', async (req, res) => {
         const token = authResponse.data.response.token;
         console.log('Authentication successful, token:', token);
 
-        // Create a new record in FileMaker
-        console.log('Creating record in FileMaker...');
-        const createResponse = await axios.post(
-            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/layouts/${fmLayout}/records`,
-            recordData,
+        // Perform the FileMaker script
+        console.log('Performing FileMaker script...');
+        const scriptResponse = await axios.get(
+            `https://${fmHost}/fmi/data/vLatest/databases/${fmDatabase}/layouts/${fmLayout}/script/${fmScript}`,
             {
+                params: {
+                    'script.param': JSON.stringify(scriptParam)
+                },
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 }
             }
         );
-        console.log('Record created successfully:', createResponse.data);
+        console.log('Script executed successfully:', scriptResponse.data);
 
         // Log out of the Data API session
         console.log('Logging out of FileMaker session...');
@@ -113,7 +79,7 @@ app.post('/', async (req, res) => {
         );
         console.log('Logged out successfully');
     } catch (error) {
-        console.error('Error sending data to FileMaker:', {
+        console.error('Error interacting with FileMaker:', {
             message: error.message,
             status: error.response ? error.response.status : 'No status',
             data: error.response ? error.response.data : 'No data'
